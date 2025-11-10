@@ -1,0 +1,50 @@
+@if (isOpen && note) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ note.title }}</h2>
+        <button class="btn-close" (click)="close()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="note-metadata">
+          <div class="metadata-item">
+            <span class="label">Visibilité:</span>
+            <span class="value visibility-{{ note.visibility.toLowerCase() }}">{{ note.visibility }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Créée le:</span>
+            <span class="value">{{ note.createdAt | date:'medium' }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="label">Modifiée le:</span>
+            <span class="value">{{ note.updatedAt | date:'medium' }}</span>
+          </div>
+        </div>
+
+        @if (note.tags && note.tags.length > 0) {
+          <div class="tags-section">
+            <span class="label">Tags:</span>
+            <div class="tags-list">
+              @for (tag of note.tags; track tag) {
+                <span class="tag">{{ tag }}</span>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="content-section">
+          <h3>Contenu</h3>
+          <div class="markdown-content" [innerHTML]="renderMarkdown(note.contentMd)"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="close()">Fermer</button>
+        <button class="btn-edit" (click)="onEdit.emit(note.id)">Modifier</button>
+        <button class="btn-delete" (click)="onDelete.emit(note.id)">Supprimer</button>
+      </div>
+    </div>
+  </div>
+}
+

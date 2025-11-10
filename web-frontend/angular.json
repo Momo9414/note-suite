@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "notes-frontend-angular": {
+    "notes-frontend": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/notes-frontend-angular",
+            "outputPath": "dist/notes-frontend",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -30,7 +30,6 @@
               "src/assets"
             ],
             "styles": [
-              "@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
             "scripts": []
@@ -63,21 +62,18 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "notes-frontend-angular:build:production"
+              "buildTarget": "notes-frontend:build:production"
             },
             "development": {
-              "buildTarget": "notes-frontend-angular:build:development"
+              "buildTarget": "notes-frontend:build:development"
             }
           },
-          "defaultConfiguration": "development",
-          "options": {
-            "port": 4200
-          }
+          "defaultConfiguration": "development"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "notes-frontend-angular:build"
+            "buildTarget": "notes-frontend:build"
           }
         },
         "test": {
@@ -94,7 +90,6 @@
               "src/assets"
             ],
             "styles": [
-              "@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
             "scripts": []
@@ -104,4 +99,3 @@
     }
   }
 }
-

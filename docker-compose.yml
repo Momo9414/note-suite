@@ -1,70 +1,68 @@
 version: '3.8'
 
 services:
-  postgres:
+  # PostgreSQL Database
+  db:
     image: postgres:15-alpine
-    container_name: notes-postgres
+    container_name: notes-db
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-notes_db}
       POSTGRES_USER: ${POSTGRES_USER:-notes_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password_123}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./docker/init-scripts:/docker-entrypoint-initdb.d
-    networks:
-      - notes-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-notes_user}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-notes_user} -d ${POSTGRES_DB:-notes_db}"]
       interval: 10s
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    networks:
+      - notes-network
 
-  backend:
+  # Spring Boot API
+  api:
     build:
       context: ./backend-spring
       dockerfile: Dockerfile
-    container_name: notes-backend
+    container_name: notes-api
     environment:
-      DATABASE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-notes_db}
+      DATABASE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-notes_db}
       DATABASE_USERNAME: ${POSTGRES_USER:-notes_user}
-      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-secure_password}
-      JWT_SECRET: ${JWT_SECRET}
-      SERVER_PORT: 8080
-      CORS_ALLOWED_ORIGINS: http://localhost:4200
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-secure_password_123}
+      JWT_SECRET: ${JWT_SECRET:-votre_secret_jwt_tres_securise_avec_au_moins_256_bits}
+      CORS_ALLOWED_ORIGINS: http://localhost:3000,http://localhost:4200,http://localhost:8081
     ports:
       - "${BACKEND_PORT:-8080}:8080"
     depends_on:
-      postgres:
+      db:
         condition: service_healthy
-    networks:
-      - notes-network
     volumes:
       - ./logs:/app/logs
     restart: unless-stopped
+    networks:
+      - notes-network
 
-  frontend:
+  # Angular Frontend (Nginx)
+  web:
     build:
       context: ./web-frontend
       dockerfile: Dockerfile
-    container_name: notes-frontend
-    environment:
-      NG_APP_API_BASE_URL: http://localhost:8080/api/v1
+    container_name: notes-web
     ports:
-      - "${FRONTEND_PORT:-4200}:80"
+      - "${FRONTEND_PORT:-8081}:80"
     depends_on:
-      - backend
+      - api
+    restart: unless-stopped
     networks:
       - notes-network
-    restart: unless-stopped
-
-networks:
-  notes-network:
-    driver: bridge
 
 volumes:
   postgres_data:
     driver: local
 
+networks:
+  notes-network:
+    driver: bridge

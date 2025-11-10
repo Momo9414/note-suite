@@ -1,0 +1,48 @@
+<div class="form-container">
+  <div class="form-card">
+    <h2>{{ isEditMode ? 'Modifier la note' : 'Nouvelle note' }}</h2>
+    
+    <form [formGroup]="noteForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label>Titre</label>
+        <input type="text" formControlName="title" class="form-control" placeholder="Titre de la note">
+        @if (noteForm.get('title')?.invalid && noteForm.get('title')?.touched) {
+          <div class="error">Le titre doit contenir entre 3 et 255 caractères</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label>Contenu (Markdown)</label>
+        <textarea formControlName="contentMd" class="form-control" rows="10" 
+                  placeholder="# Titre&#10;&#10;Contenu en **Markdown**..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Visibilité</label>
+        <select formControlName="visibility" class="form-control">
+          <option value="PRIVATE">Privée</option>
+          <option value="SHARED">Partagée</option>
+          <option value="PUBLIC">Publique</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Tags (séparés par des virgules)</label>
+        <input type="text" formControlName="tagsInput" class="form-control" 
+               placeholder="travail, important, urgent">
+      </div>
+
+      @if (errorMessage) {
+        <div class="error">{{ errorMessage }}</div>
+      }
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" (click)="cancel()">Annuler</button>
+        <button type="submit" [disabled]="noteForm.invalid || loading" class="btn-primary">
+          {{ loading ? 'Enregistrement...' : (isEditMode ? 'Modifier' : 'Créer') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+

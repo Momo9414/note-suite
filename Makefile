@@ -1,127 +1,72 @@
-.PHONY: help setup start stop restart clean logs test build
+.PHONY: help build up down logs clean restart backend frontend db mobile test
 
-# Variables
-DOCKER_COMPOSE = docker compose
-DOCKER_COMPOSE_DEV = docker compose -f docker-compose.dev.yml
+help:
+	@echo "═══════════════════════════════════════════════════════"
+	@echo "  Notes Suite - Commandes Docker"
+	@echo "═══════════════════════════════════════════════════════"
+	@echo ""
+	@echo "  make build      - Build toutes les images"
+	@echo "  make up         - Démarrer tous les services"
+	@echo "  make down       - Arrêter tous les services"
+	@echo "  make restart    - Redémarrer tous les services"
+	@echo "  make logs       - Voir les logs"
+	@echo "  make clean      - Nettoyer images et volumes"
+	@echo ""
+	@echo "  make backend    - Démarrer uniquement le backend"
+	@echo "  make frontend   - Démarrer uniquement le frontend"
+	@echo "  make db         - Démarrer uniquement la DB"
+	@echo "  make mobile     - Démarrer l'app mobile"
+	@echo ""
+	@echo "  make test       - Tester les services"
+	@echo ""
 
-help: ## Afficher cette aide
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
+build:
+	@echo "🔨 Building images..."
+	docker compose build
 
-setup: ## Configuration initiale du projet
-	@echo "📦 Installation des dépendances..."
-	@if [ -d "backend-spring" ]; then cd backend-spring && mvn clean install -DskipTests; fi
-	@if [ -d "web-frontend" ]; then cd web-frontend && npm install; fi
-	@if [ -d "mobile-app" ]; then cd mobile-app && flutter pub get; fi
-	@echo "✅ Setup terminé !"
+up:
+	@echo "🚀 Starting services..."
+	docker compose up -d
+	@echo "✅ Services started!"
+	@echo "   Backend: http://localhost:8080/api/v1"
+	@echo "   Frontend: http://localhost:8081"
+	@echo "   Swagger: http://localhost:8080/api/v1/swagger-ui.html"
 
-start: ## Démarrer tous les services
-	@echo "🚀 Démarrage des services..."
-	$(DOCKER_COMPOSE) up -d
-	@echo "✅ Services démarrés !"
-	@echo "   - Backend: http://localhost:8080"
-	@echo "   - Frontend: http://localhost:4200"
-	@echo "   - API Docs: http://localhost:8080/swagger-ui.html"
+down:
+	@echo "🛑 Stopping services..."
+	docker compose down
 
-start-dev: ## Démarrer uniquement la base de données (pour dev local)
-	@echo "🚀 Démarrage de PostgreSQL..."
-	$(DOCKER_COMPOSE_DEV) up -d
-	@echo "✅ PostgreSQL démarré sur localhost:5432"
+restart: down up
 
-stop: ## Arrêter tous les services
-	@echo "🛑 Arrêt des services..."
-	$(DOCKER_COMPOSE) down
-	@echo "✅ Services arrêtés !"
+logs:
+	docker compose logs -f
 
-stop-dev: ## Arrêter la base de données de dev
-	$(DOCKER_COMPOSE_DEV) down
+clean:
+	@echo "🧹 Cleaning..."
+	docker compose down -v
+	docker system prune -f
+	@echo "✅ Cleaned!"
 
-restart: stop start ## Redémarrer tous les services
+backend:
+	@echo "🚀 Starting backend..."
+	docker compose up -d db api
+	@echo "✅ Backend: http://localhost:8080/api/v1"
 
-clean: ## Nettoyer les conteneurs et volumes
-	@echo "🧹 Nettoyage..."
-	$(DOCKER_COMPOSE) down -v
-	$(DOCKER_COMPOSE_DEV) down -v
-	@echo "✅ Nettoyage terminé !"
+frontend:
+	@echo "🚀 Starting frontend..."
+	docker compose up -d web
+	@echo "✅ Frontend: http://localhost:8081"
 
-logs: ## Afficher les logs de tous les services
-	$(DOCKER_COMPOSE) logs -f
+db:
+	@echo "🚀 Starting database..."
+	docker compose up -d db
+	@echo "✅ Database: localhost:5432"
 
-logs-backend: ## Afficher les logs du backend
-	$(DOCKER_COMPOSE) logs -f backend
+mobile:
+	@echo "📱 Starting mobile app..."
+	cd mobile-app && npm start
 
-logs-frontend: ## Afficher les logs du frontend
-	$(DOCKER_COMPOSE) logs -f frontend
-
-logs-postgres: ## Afficher les logs de PostgreSQL
-	$(DOCKER_COMPOSE) logs -f postgres
-
-test: ## Exécuter tous les tests
-	@echo "🧪 Exécution des tests..."
-	@if [ -d "backend-spring" ]; then cd backend-spring && mvn test; fi
-	@if [ -d "web-frontend" ]; then cd web-frontend && npm test; fi
-	@if [ -d "mobile-app" ]; then cd mobile-app && flutter test; fi
-	@echo "✅ Tests terminés !"
-
-test-backend: ## Exécuter les tests du backend
-	cd backend-spring && mvn test
-
-test-frontend: ## Exécuter les tests du frontend
-	cd web-frontend && npm test
-
-test-mobile: ## Exécuter les tests mobile
-	cd mobile-app && flutter test
-
-build: ## Construire tous les services
-	@echo "🔨 Construction des services..."
-	$(DOCKER_COMPOSE) build
-	@echo "✅ Construction terminée !"
-
-build-backend: ## Construire le backend
-	cd backend-spring && mvn clean package -DskipTests
-
-build-frontend: ## Construire le frontend
-	cd web-frontend && npm run build
-
-build-mobile: ## Construire l'app mobile
-	cd mobile-app && flutter build apk
-
-db-migrate: ## Exécuter les migrations de base de données
-	@echo "🗄️  Exécution des migrations..."
-	cd backend-spring && mvn flyway:migrate
-	@echo "✅ Migrations terminées !"
-
-db-backup: ## Sauvegarder la base de données
-	@echo "💾 Sauvegarde de la base de données..."
-	docker exec notes-postgres pg_dump -U notes_user notes_db > backup_$(shell date +%Y%m%d_%H%M%S).sql
-	@echo "✅ Sauvegarde terminée !"
-
-db-restore: ## Restaurer la base de données (usage: make db-restore FILE=backup.sql)
-	@if [ -z "$(FILE)" ]; then echo "❌ Erreur: Spécifiez le fichier avec FILE=backup.sql"; exit 1; fi
-	@echo "📥 Restauration de la base de données..."
-	docker exec -i notes-postgres psql -U notes_user notes_db < $(FILE)
-	@echo "✅ Restauration terminée !"
-
-dev-backend: ## Lancer le backend en mode dev
-	cd backend-spring && mvn spring-boot:run
-
-dev-frontend: ## Lancer le frontend en mode dev
-	cd web-frontend && npm start
-
-dev-mobile: ## Lancer l'app mobile en mode dev
-	cd mobile-app && flutter run
-
-format: ## Formater le code
-	@echo "🎨 Formatage du code..."
-	@if [ -d "web-frontend" ]; then cd web-frontend && npm run format; fi
-	@if [ -d "mobile-app" ]; then cd mobile-app && dart format .; fi
-	@echo "✅ Formatage terminé !"
-
-lint: ## Linter le code
-	@echo "🔍 Analyse du code..."
-	@if [ -d "web-frontend" ]; then cd web-frontend && npm run lint; fi
-	@if [ -d "mobile-app" ]; then cd mobile-app && flutter analyze; fi
-	@echo "✅ Analyse terminée !"
-
-ps: ## Afficher les services en cours d'exécution
-	$(DOCKER_COMPOSE) ps
-
+test:
+	@echo "🧪 Testing services..."
+	@curl -s http://localhost:8080/api/v1/health && echo "✅ Backend OK" || echo "❌ Backend KO"
+	@curl -s -I http://localhost:8081 | head -1 && echo "✅ Frontend OK" || echo "❌ Frontend KO"

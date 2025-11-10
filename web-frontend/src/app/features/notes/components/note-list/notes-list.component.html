@@ -1,0 +1,89 @@
+<div class="notes-container">
+  <header class="header">
+    <h1>Mes Notes</h1>
+    <div class="header-actions">
+      <button class="btn-primary" routerLink="/notes/new">+ Nouvelle note</button>
+      <button class="btn-secondary" (click)="logout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <div class="search-bar">
+    <input 
+      type="text"
+      [(ngModel)]="searchQuery"
+      (ngModelChange)="onSearch()"
+      class="search-input"
+      placeholder="Rechercher dans les notes (titre ou contenu)...">
+    <ng-container *ngIf="searchQuery">
+      <button class="btn-clear" (click)="clearSearch()">Effacer</button>
+    </ng-container>
+  </div>
+
+  @if (loading) {
+    <div class="loading">Chargement...</div>
+  }
+
+  @if (!loading && notes.length === 0) {
+    <div class="empty-state">
+      <p>Aucune note pour le moment</p>
+      <button class="btn-primary" routerLink="/notes/new">Créer une note</button>
+    </div>
+  }
+
+  @if (!loading && notes.length > 0) {
+    <div class="notes-grid">
+      @for (note of notes; track note.id) {
+        <div class="note-card">
+          <div class="note-content" (click)="viewNote(note.id)">
+            <h3>{{ note.title }}</h3>
+            <p class="note-preview">{{ note.contentMd | slice:0:150 }}...</p>
+            <div class="note-meta">
+              <span class="note-date">{{ note.updatedAt | date:'short' }}</span>
+              @if (note.tags && note.tags.length > 0) {
+                <div class="note-tags">
+                  @for (tag of note.tags; track tag) {
+                    <span class="tag">{{ tag }}</span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+          <div class="note-actions">
+            <button class="btn-edit" (click)="editNote(note.id)">Modifier</button>
+            <button class="btn-delete" (click)="deleteNote(note.id)">Supprimer</button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="pagination">
+      <div class="pagination-info">
+        Page {{ currentPage + 1 }} sur {{ totalPages }} - {{ totalElements }} notes au total
+      </div>
+      <div class="pagination-controls">
+        <button class="btn-page" (click)="goToPage(0)" [disabled]="isFirstPage">
+          Première
+        </button>
+        <button class="btn-page" (click)="previousPage()" [disabled]="isFirstPage">
+          Précédente
+        </button>
+        <span class="page-number">{{ currentPage + 1 }} / {{ totalPages }}</span>
+        <button class="btn-page" (click)="nextPage()" [disabled]="isLastPage">
+          Suivante
+        </button>
+        <button class="btn-page" (click)="goToPage(totalPages - 1)" [disabled]="isLastPage">
+          Dernière
+        </button>
+      </div>
+    </div>
+  }
+
+  <app-note-detail-modal
+    [note]="selectedNote"
+    [isOpen]="isModalOpen"
+    (onClose)="closeModal()"
+    (onEdit)="editNote($event)"
+    (onDelete)="deleteNoteFromModal($event)">
+  </app-note-detail-modal>
+</div>
+
