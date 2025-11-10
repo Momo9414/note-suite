@@ -1,0 +1,68 @@
+name: Mobile Flutter CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'mobile-app/**'
+      - '.github/workflows/mobile-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'mobile-app/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.16.0'
+        channel: 'stable'
+        cache: true
+    
+    - name: Get dependencies
+      working-directory: ./mobile-app
+      run: flutter pub get
+    
+    - name: Generate code
+      working-directory: ./mobile-app
+      run: flutter pub run build_runner build --delete-conflicting-outputs
+    
+    - name: Analyze code
+      working-directory: ./mobile-app
+      run: flutter analyze
+    
+    - name: Format check
+      working-directory: ./mobile-app
+      run: dart format --output=none --set-exit-if-changed .
+    
+    - name: Run tests
+      working-directory: ./mobile-app
+      run: flutter test --coverage
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./mobile-app/coverage/lcov.info
+        flags: mobile
+        name: mobile-coverage
+    
+    - name: Build APK
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      working-directory: ./mobile-app
+      run: flutter build apk --release
+    
+    - name: Upload APK artifact
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-release
+        path: mobile-app/build/app/outputs/flutter-apk/app-release.apk
+        retention-days: 7
+

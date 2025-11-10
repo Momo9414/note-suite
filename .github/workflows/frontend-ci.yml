@@ -1,0 +1,64 @@
+name: Frontend Angular CI
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'web-frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'web-frontend/**'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: web-frontend/package-lock.json
+    
+    - name: Install dependencies
+      working-directory: ./web-frontend
+      run: npm ci
+    
+    - name: Lint
+      working-directory: ./web-frontend
+      run: npm run lint
+    
+    - name: Build
+      working-directory: ./web-frontend
+      run: npm run build:prod
+    
+    - name: Run tests
+      working-directory: ./web-frontend
+      run: npm run test:coverage
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./web-frontend/coverage/lcov.info
+        flags: frontend
+        name: frontend-coverage
+    
+    - name: Build Docker image
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      working-directory: ./web-frontend
+      run: docker build -t notes-frontend:${{ github.sha }} .
+    
+    - name: Upload build artifacts
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v3
+      with:
+        name: frontend-dist
+        path: web-frontend/dist/
+        retention-days: 7
+
