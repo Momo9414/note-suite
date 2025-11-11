@@ -12,12 +12,46 @@ import {
   Modal,
   ScrollView,
   SafeAreaView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { authService } from './src/features/auth/services/authService';
 import { notesService } from './src/features/notes/services/notesService';
 import { Note } from './src/core/types';
+
+// Modern Color Palette
+const COLORS = {
+  primary: '#6366F1',      // Indigo moderne
+  primaryDark: '#4F46E5',
+  primaryLight: '#818CF8',
+  secondary: '#10B981',    // Green moderne
+  danger: '#EF4444',
+  warning: '#F59E0B',
+  
+  background: '#F9FAFB',
+  surface: '#FFFFFF',
+  surfaceHover: '#F3F4F6',
+  
+  text: {
+    primary: '#111827',
+    secondary: '#6B7280',
+    tertiary: '#9CA3AF',
+    inverse: '#FFFFFF',
+  },
+  
+  border: {
+    light: '#E5E7EB',
+    medium: '#D1D5DB',
+    dark: '#9CA3AF',
+  },
+  
+  shadow: {
+    sm: 'rgba(0, 0, 0, 0.05)',
+    md: 'rgba(0, 0, 0, 0.1)',
+    lg: 'rgba(0, 0, 0, 0.15)',
+  },
+};
 
 export default function App() {
   const [screen, setScreen] = useState('loading');
@@ -215,7 +249,7 @@ export default function App() {
   if (screen === 'loading') {
     return (
       <SafeAreaView style={styles.center}>
-        <ActivityIndicator size="large" color="#2196F3" />
+        <ActivityIndicator size="large" color={COLORS.primary} />
         <StatusBar style="auto" />
       </SafeAreaView>
     );
@@ -227,17 +261,18 @@ export default function App() {
       <SafeAreaView style={styles.container}>
         <View style={styles.loginContent}>
           <View style={styles.logoBox}>
-            <Ionicons name="document-text" size={48} color="#2196F3" />
+            <Ionicons name="document-text" size={56} color={COLORS.text.inverse} />
           </View>
           
           <Text style={styles.titleBig}>Notes App</Text>
           <Text style={styles.subtitle}>Gestion professionnelle de notes</Text>
 
           <View style={styles.inputBox}>
-            <Ionicons name="mail-outline" size={20} color="#666" />
+            <Ionicons name="mail-outline" size={22} color={COLORS.text.tertiary} />
             <TextInput
               style={styles.input}
               placeholder="Email"
+              placeholderTextColor={COLORS.text.tertiary}
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -246,10 +281,11 @@ export default function App() {
           </View>
 
           <View style={styles.inputBox}>
-            <Ionicons name="lock-closed-outline" size={20} color="#666" />
+            <Ionicons name="lock-closed-outline" size={22} color={COLORS.text.tertiary} />
             <TextInput
               style={styles.input}
-              placeholder="Password"
+              placeholder="Mot de passe"
+              placeholderTextColor={COLORS.text.tertiary}
               value={password}
               onChangeText={setPassword}
               secureTextEntry={!showPassword}
@@ -257,8 +293,8 @@ export default function App() {
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <Ionicons 
                 name={showPassword ? 'eye-off-outline' : 'eye-outline'} 
-                size={20} 
-                color="#666" 
+                size={22} 
+                color={COLORS.text.tertiary} 
               />
             </TouchableOpacity>
           </View>
@@ -269,11 +305,11 @@ export default function App() {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <ActivityIndicator color={COLORS.text.inverse} size="small" />
             ) : (
               <>
                 <Text style={styles.buttonText}>Se connecter</Text>
-                <Ionicons name="arrow-forward" size={20} color="#fff" />
+                <Ionicons name="arrow-forward" size={22} color={COLORS.text.inverse} />
               </>
             )}
           </TouchableOpacity>
@@ -293,19 +329,20 @@ export default function App() {
   if (bottomTab === 'create') {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => setBottomTab('list')}>
-            <Ionicons name="arrow-back" size={24} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Nouvelle Note</Text>
-          <View style={{ width: 24 }} />
-        </View>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => setBottomTab('list')}>
+          <Ionicons name="arrow-back" size={26} color={COLORS.text.primary} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Nouvelle Note</Text>
+        <View style={{ width: 26 }} />
+      </View>
 
         <ScrollView style={styles.createContent}>
           <Text style={styles.label}>Titre *</Text>
           <TextInput
             style={styles.inputCreate}
             placeholder="Titre de la note"
+            placeholderTextColor={COLORS.text.tertiary}
             value={newTitle}
             onChangeText={setNewTitle}
           />
@@ -314,6 +351,7 @@ export default function App() {
           <TextInput
             style={[styles.inputCreate, styles.textArea]}
             placeholder="Contenu de la note..."
+            placeholderTextColor={COLORS.text.tertiary}
             value={newContent}
             onChangeText={setNewContent}
             multiline
@@ -325,6 +363,7 @@ export default function App() {
           <TextInput
             style={styles.inputCreate}
             placeholder="React, JavaScript, Mobile"
+            placeholderTextColor={COLORS.text.tertiary}
             value={newTags}
             onChangeText={setNewTags}
           />
@@ -335,10 +374,10 @@ export default function App() {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <ActivityIndicator color={COLORS.text.inverse} size="small" />
             ) : (
               <>
-                <Ionicons name="checkmark" size={24} color="#fff" />
+                <Ionicons name="checkmark-circle" size={26} color={COLORS.text.inverse} />
                 <Text style={styles.buttonText}>Créer la note</Text>
               </>
             )}
@@ -356,11 +395,11 @@ export default function App() {
     <TouchableOpacity 
       style={styles.noteCard}
       onPress={() => setSelectedNote(item)}
-      activeOpacity={0.7}
+      activeOpacity={0.8}
     >
       <View style={styles.noteHeader}>
         <View style={styles.noteIconBox}>
-          <Ionicons name="document-text-outline" size={24} color="#2196F3" />
+          <Ionicons name="document-text-outline" size={26} color={COLORS.primary} />
         </View>
         <View style={styles.noteTitleBox}>
           <Text style={styles.noteTitle} numberOfLines={1}>
@@ -386,7 +425,7 @@ export default function App() {
         <View style={styles.tags}>
           {item.tags.slice(0, 3).map((tag, idx) => (
             <View key={idx} style={styles.tag}>
-              <Ionicons name="pricetag" size={10} color="#2196F3" />
+              <Ionicons name="pricetag" size={11} color={COLORS.primary} />
               <Text style={styles.tagText}>{tag}</Text>
             </View>
           ))}
@@ -407,16 +446,17 @@ export default function App() {
           <Text style={styles.headerSubtitle}>{totalElements} notes</Text>
         </View>
         <TouchableOpacity onPress={() => setShowProfile(true)} style={styles.profileBtn}>
-          <Ionicons name="person-circle-outline" size={32} color="#fff" />
+          <Ionicons name="person-circle-outline" size={28} color={COLORS.text.secondary} />
         </TouchableOpacity>
       </View>
 
       {/* Search */}
       <View style={styles.searchBox}>
-        <Ionicons name="search" size={20} color="#666" />
+        <Ionicons name="search" size={22} color={COLORS.text.tertiary} />
         <TextInput
           style={styles.searchInput}
           placeholder="Rechercher dans les notes..."
+          placeholderTextColor={COLORS.text.tertiary}
           value={searchQuery}
           onChangeText={(text) => {
             setSearchQuery(text);
@@ -425,7 +465,7 @@ export default function App() {
         />
         {searchQuery.length > 0 && (
           <TouchableOpacity onPress={() => setSearchQuery('')}>
-            <Ionicons name="close-circle" size={20} color="#666" />
+            <Ionicons name="close-circle" size={22} color={COLORS.text.tertiary} />
           </TouchableOpacity>
         )}
       </View>
@@ -441,7 +481,7 @@ export default function App() {
         }
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Ionicons name="folder-open-outline" size={64} color="#ccc" />
+            <Ionicons name="folder-open-outline" size={72} color={COLORS.border.medium} />
             <Text style={styles.emptyTitle}>Aucune note</Text>
             <Text style={styles.emptyText}>
               {searchQuery ? 'Aucun résultat' : 'Créez votre première note'}
@@ -458,7 +498,7 @@ export default function App() {
             disabled={page === 0}
             style={styles.pageBtnSmall}
           >
-            <Ionicons name="play-back" size={20} color={page === 0 ? '#ccc' : '#2196F3'} />
+            <Ionicons name="play-back" size={18} color={page === 0 ? COLORS.border.medium : COLORS.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -466,7 +506,7 @@ export default function App() {
             disabled={page === 0}
             style={styles.pageBtn}
           >
-            <Ionicons name="chevron-back" size={24} color={page === 0 ? '#ccc' : '#2196F3'} />
+            <Ionicons name="chevron-back" size={22} color={page === 0 ? COLORS.border.medium : COLORS.primary} />
           </TouchableOpacity>
           
           <View style={styles.pageInfo}>
@@ -480,7 +520,7 @@ export default function App() {
             disabled={page === totalPages - 1}
             style={styles.pageBtn}
           >
-            <Ionicons name="chevron-forward" size={24} color={page === totalPages - 1 ? '#ccc' : '#2196F3'} />
+            <Ionicons name="chevron-forward" size={22} color={page === totalPages - 1 ? COLORS.border.medium : COLORS.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity 
@@ -488,7 +528,7 @@ export default function App() {
             disabled={page === totalPages - 1}
             style={styles.pageBtnSmall}
           >
-            <Ionicons name="play-forward" size={20} color={page === totalPages - 1 ? '#ccc' : '#2196F3'} />
+            <Ionicons name="play-forward" size={18} color={page === totalPages - 1 ? COLORS.border.medium : COLORS.primary} />
           </TouchableOpacity>
         </View>
       )}
@@ -505,7 +545,7 @@ export default function App() {
         <SafeAreaView style={styles.modal}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setSelectedNote(null)}>
-              <Ionicons name="close" size={28} color="#fff" />
+              <Ionicons name="close" size={28} color={COLORS.text.primary} />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Détails</Text>
             <TouchableOpacity 
@@ -515,7 +555,7 @@ export default function App() {
                 }
               }}
             >
-              <Ionicons name="create-outline" size={24} color="#fff" />
+              <Ionicons name="create-outline" size={26} color={COLORS.text.primary} />
             </TouchableOpacity>
           </View>
 
@@ -537,7 +577,7 @@ export default function App() {
                 <View style={styles.tags}>
                   {selectedNote.tags.map((tag, idx) => (
                     <View key={idx} style={styles.tagBig}>
-                      <Ionicons name="pricetag" size={12} color="#2196F3" />
+                      <Ionicons name="pricetag" size={13} color={COLORS.primary} />
                       <Text style={styles.tagBigText}>{tag}</Text>
                     </View>
                   ))}
@@ -555,7 +595,7 @@ export default function App() {
                   }
                 }}
               >
-                <Ionicons name="create-outline" size={20} color="#2196F3" />
+                <Ionicons name="create-outline" size={22} color={COLORS.primary} />
                 <Text style={styles.editBtnText}>Modifier</Text>
               </TouchableOpacity>
 
@@ -568,7 +608,7 @@ export default function App() {
                   }
                 }}
               >
-                <Ionicons name="trash-outline" size={20} color="#F44336" />
+                <Ionicons name="trash-outline" size={22} color={COLORS.danger} />
                 <Text style={styles.deleteBtnText}>Supprimer</Text>
               </TouchableOpacity>
             </View>
@@ -585,7 +625,7 @@ export default function App() {
         <SafeAreaView style={styles.modal}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setEditMode(false)}>
-              <Ionicons name="close" size={28} color="#fff" />
+              <Ionicons name="close" size={28} color={COLORS.text.primary} />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Modifier la Note</Text>
             <View style={{ width: 28 }} />
@@ -596,6 +636,7 @@ export default function App() {
             <TextInput
               style={styles.inputCreate}
               placeholder="Titre de la note"
+              placeholderTextColor={COLORS.text.tertiary}
               value={newTitle}
               onChangeText={setNewTitle}
             />
@@ -604,6 +645,7 @@ export default function App() {
             <TextInput
               style={[styles.inputCreate, styles.textArea]}
               placeholder="Écrivez votre contenu ici..."
+              placeholderTextColor={COLORS.text.tertiary}
               value={newContent}
               onChangeText={setNewContent}
               multiline
@@ -615,6 +657,7 @@ export default function App() {
             <TextInput
               style={styles.inputCreate}
               placeholder="React, JavaScript, Mobile"
+              placeholderTextColor={COLORS.text.tertiary}
               value={newTags}
               onChangeText={setNewTags}
             />
@@ -626,10 +669,10 @@ export default function App() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={COLORS.text.inverse} size="small" />
               ) : (
                 <>
-                  <Ionicons name="save" size={24} color="#fff" />
+                  <Ionicons name="save" size={26} color={COLORS.text.inverse} />
                   <Text style={styles.buttonText}>Enregistrer</Text>
                 </>
               )}
@@ -648,12 +691,12 @@ export default function App() {
         <View style={styles.modalOverlay}>
           <View style={styles.profileModal}>
             <View style={styles.profileHeader}>
-              <Ionicons name="person-circle" size={64} color="#2196F3" />
+              <Ionicons name="person-circle" size={72} color={COLORS.primary} />
               <Text style={styles.profileEmail}>{email || 'Utilisateur'}</Text>
             </View>
 
             <TouchableOpacity style={styles.profileOption} onPress={() => setShowProfile(false)}>
-              <Ionicons name="settings-outline" size={24} color="#666" />
+              <Ionicons name="settings-outline" size={26} color={COLORS.text.secondary} />
               <Text style={styles.profileOptionText}>Paramètres</Text>
             </TouchableOpacity>
 
@@ -664,8 +707,8 @@ export default function App() {
                 handleLogout();
               }}
             >
-              <Ionicons name="log-out-outline" size={24} color="#F44336" />
-              <Text style={[styles.profileOptionText, { color: '#F44336' }]}>
+              <Ionicons name="log-out-outline" size={26} color={COLORS.danger} />
+              <Text style={[styles.profileOptionText, { color: COLORS.danger }]}>
                 Déconnexion
               </Text>
             </TouchableOpacity>
@@ -689,7 +732,7 @@ export default function App() {
         <SafeAreaView style={styles.modal}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setCreateMode(false)}>
-              <Ionicons name="close" size={28} color="#fff" />
+              <Ionicons name="close" size={28} color={COLORS.text.primary} />
             </TouchableOpacity>
             <Text style={styles.modalTitle}>Nouvelle Note</Text>
             <View style={{ width: 28 }} />
@@ -700,6 +743,7 @@ export default function App() {
             <TextInput
               style={styles.inputCreate}
               placeholder="Titre de la note"
+              placeholderTextColor={COLORS.text.tertiary}
               value={newTitle}
               onChangeText={setNewTitle}
             />
@@ -708,6 +752,7 @@ export default function App() {
             <TextInput
               style={[styles.inputCreate, styles.textArea]}
               placeholder="Écrivez votre contenu ici..."
+              placeholderTextColor={COLORS.text.tertiary}
               value={newContent}
               onChangeText={setNewContent}
               multiline
@@ -719,6 +764,7 @@ export default function App() {
             <TextInput
               style={styles.inputCreate}
               placeholder="React, JavaScript, Mobile"
+              placeholderTextColor={COLORS.text.tertiary}
               value={newTags}
               onChangeText={setNewTags}
             />
@@ -730,10 +776,10 @@ export default function App() {
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color="#fff" size="small" />
+                <ActivityIndicator color={COLORS.text.inverse} size="small" />
               ) : (
                 <>
-                  <Ionicons name="checkmark-circle" size={24} color="#fff" />
+                  <Ionicons name="checkmark-circle" size={26} color={COLORS.text.inverse} />
                   <Text style={styles.buttonText}>Créer la note</Text>
                 </>
               )}
@@ -756,8 +802,8 @@ function BottomMenu({ tab, setTab, onLogout }: any) {
       >
         <Ionicons 
           name={tab === 'list' ? 'list' : 'list-outline'} 
-          size={24} 
-          color={tab === 'list' ? '#2196F3' : '#666'} 
+          size={26} 
+          color={tab === 'list' ? COLORS.primary : COLORS.text.tertiary} 
         />
         <Text style={[styles.menuText, tab === 'list' && styles.menuTextActive]}>
           Liste
@@ -769,7 +815,7 @@ function BottomMenu({ tab, setTab, onLogout }: any) {
         onPress={() => setTab('create')}
       >
         <View style={styles.createButton}>
-          <Ionicons name="add" size={28} color="#fff" />
+          <Ionicons name="add" size={32} color={COLORS.text.inverse} />
         </View>
       </TouchableOpacity>
 
@@ -777,7 +823,7 @@ function BottomMenu({ tab, setTab, onLogout }: any) {
         style={styles.menuItem}
         onPress={onLogout}
       >
-        <Ionicons name="log-out-outline" size={24} color="#666" />
+        <Ionicons name="log-out-outline" size={26} color={COLORS.text.tertiary} />
         <Text style={styles.menuText}>Quitter</Text>
       </TouchableOpacity>
     </View>
@@ -787,179 +833,248 @@ function BottomMenu({ tab, setTab, onLogout }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: COLORS.background,
   },
   center: {
     flex: 1,
     justifyContent: 'center' as any,
     alignItems: 'center' as any,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.surface,
   },
   loginContent: {
     flex: 1,
     justifyContent: 'center' as any,
-    padding: 24,
-    backgroundColor: '#fff',
+    padding: 32,
+    backgroundColor: COLORS.surface,
   },
   logoBox: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: '#E3F2FD',
+    width: 96,
+    height: 96,
+    borderRadius: 24,
+    backgroundColor: COLORS.primary,
     justifyContent: 'center' as any,
     alignItems: 'center' as any,
     alignSelf: 'center' as any,
-    marginBottom: 24,
+    marginBottom: 32,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.primary,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.3,
+        shadowRadius: 16,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
   },
   titleBig: {
-    fontSize: 32,
-    fontWeight: 'bold' as any,
+    fontSize: 36,
+    fontWeight: '700' as any,
     textAlign: 'center' as any,
-    color: '#1a1a1a',
+    color: COLORS.text.primary,
     marginBottom: 8,
+    letterSpacing: -0.5,
   },
   subtitle: {
-    fontSize: 15,
+    fontSize: 16,
     textAlign: 'center' as any,
-    color: '#666',
-    marginBottom: 40,
+    color: COLORS.text.secondary,
+    marginBottom: 48,
+    fontWeight: '400' as any,
   },
   inputBox: {
     flexDirection: 'row' as any,
     alignItems: 'center' as any,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
+    backgroundColor: COLORS.surface,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: COLORS.border.light,
     paddingHorizontal: 16,
     marginBottom: 16,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.shadow.sm,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 1,
+        shadowRadius: 4,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   input: {
     flex: 1,
-    paddingVertical: 16,
+    paddingVertical: 18,
     paddingHorizontal: 12,
     fontSize: 16,
+    color: COLORS.text.primary,
   },
   button: {
-    backgroundColor: '#2196F3',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: COLORS.primary,
+    borderRadius: 16,
+    padding: 18,
     flexDirection: 'row' as any,
     justifyContent: 'center' as any,
     alignItems: 'center' as any,
     marginTop: 8,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   buttonDisabled: {
-    backgroundColor: '#90CAF9',
+    backgroundColor: COLORS.primaryLight,
+    opacity: 0.6,
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold' as any,
+    color: COLORS.text.inverse,
+    fontSize: 17,
+    fontWeight: '600' as any,
     marginLeft: 8,
+    letterSpacing: 0.3,
   },
   hint: {
-    marginTop: 40,
-    padding: 16,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
+    marginTop: 48,
+    padding: 20,
+    backgroundColor: COLORS.surfaceHover,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: COLORS.border.light,
   },
   hintTitle: {
     fontSize: 11,
-    color: '#999',
+    color: COLORS.text.tertiary,
     textAlign: 'center' as any,
     marginBottom: 12,
-    fontWeight: 'bold' as any,
+    fontWeight: '600' as any,
+    letterSpacing: 1,
   },
   hintText: {
-    fontSize: 14,
-    color: '#1a1a1a',
+    fontSize: 15,
+    color: COLORS.text.primary,
     textAlign: 'center' as any,
     marginBottom: 4,
+    fontWeight: '500' as any,
   },
   header: {
-    backgroundColor: '#2196F3',
-    padding: 16,
-    paddingTop: 12,
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 20,
     flexDirection: 'row' as any,
     justifyContent: 'space-between' as any,
     alignItems: 'center' as any,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border.light,
   },
   headerTitle: {
-    fontSize: 22,
-    fontWeight: 'bold' as any,
-    color: '#fff',
+    fontSize: 28,
+    fontWeight: '700' as any,
+    color: COLORS.text.primary,
+    letterSpacing: -0.5,
   },
   headerSubtitle: {
-    fontSize: 13,
-    color: '#fff',
-    opacity: 0.8,
+    fontSize: 14,
+    color: COLORS.text.secondary,
+    marginTop: 2,
+    fontWeight: '500' as any,
   },
   profileBtn: {
-    padding: 4,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.surfaceHover,
+    justifyContent: 'center' as any,
+    alignItems: 'center' as any,
+    borderWidth: 1,
+    borderColor: COLORS.border.light,
   },
   searchBox: {
     flexDirection: 'row' as any,
     alignItems: 'center' as any,
-    backgroundColor: '#fff',
-    margin: 16,
+    backgroundColor: COLORS.surfaceHover,
+    marginHorizontal: 20,
+    marginTop: 16,
+    marginBottom: 12,
     paddingHorizontal: 16,
-    borderRadius: 12,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: COLORS.border.light,
   },
   searchInput: {
     flex: 1,
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 12,
     fontSize: 16,
+    color: COLORS.text.primary,
   },
   list: {
-    padding: 16,
+    paddingHorizontal: 20,
+    paddingTop: 8,
     paddingBottom: 160,
   },
   noteCard: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
+    backgroundColor: COLORS.surface,
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: COLORS.border.light,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.shadow.md,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 1,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 3,
+      },
+    }),
   },
   noteHeader: {
     flexDirection: 'row' as any,
     alignItems: 'center' as any,
-    marginBottom: 12,
+    marginBottom: 14,
   },
   noteIconBox: {
-    width: 48,
-    height: 48,
-    borderRadius: 12,
-    backgroundColor: '#E3F2FD',
+    width: 52,
+    height: 52,
+    borderRadius: 14,
+    backgroundColor: COLORS.primary + '15',
     justifyContent: 'center' as any,
     alignItems: 'center' as any,
-    marginRight: 12,
+    marginRight: 14,
   },
   noteTitleBox: {
     flex: 1,
   },
   noteTitle: {
-    fontSize: 17,
-    fontWeight: 'bold' as any,
-    color: '#1a1a1a',
+    fontSize: 18,
+    fontWeight: '600' as any,
+    color: COLORS.text.primary,
     marginBottom: 4,
+    letterSpacing: -0.3,
   },
   noteDate: {
-    fontSize: 12,
-    color: '#999',
+    fontSize: 13,
+    color: COLORS.text.tertiary,
+    fontWeight: '500' as any,
   },
   noteContent: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-    marginBottom: 12,
+    fontSize: 15,
+    color: COLORS.text.secondary,
+    lineHeight: 22,
+    marginBottom: 14,
   },
   tags: {
     flexDirection: 'row' as any,
@@ -969,80 +1084,113 @@ const styles = StyleSheet.create({
   tag: {
     flexDirection: 'row' as any,
     alignItems: 'center' as any,
-    backgroundColor: '#E3F2FD',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 6,
+    backgroundColor: COLORS.primary + '12',
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 8,
     marginRight: 8,
-    marginBottom: 4,
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: COLORS.primary + '20',
   },
   tagText: {
-    fontSize: 11,
-    color: '#2196F3',
+    fontSize: 12,
+    color: COLORS.primary,
     marginLeft: 4,
+    fontWeight: '600' as any,
   },
   moreTagsText: {
-    fontSize: 11,
-    color: '#999',
+    fontSize: 12,
+    color: COLORS.text.tertiary,
     marginLeft: 4,
+    fontWeight: '500' as any,
   },
   empty: {
     alignItems: 'center' as any,
-    paddingVertical: 100,
+    paddingVertical: 120,
   },
   emptyTitle: {
-    fontSize: 20,
-    fontWeight: 'bold' as any,
-    color: '#1a1a1a',
-    marginTop: 16,
+    fontSize: 22,
+    fontWeight: '600' as any,
+    color: COLORS.text.primary,
+    marginTop: 20,
     marginBottom: 8,
   },
   emptyText: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: 15,
+    color: COLORS.text.secondary,
+    fontWeight: '400' as any,
   },
   paginationBar: {
     flexDirection: 'row' as any,
     justifyContent: 'center' as any,
     alignItems: 'center' as any,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
+    paddingVertical: 16,
+    backgroundColor: COLORS.surface,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: COLORS.border.light,
   },
   pageBtn: {
-    padding: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    justifyContent: 'center' as any,
+    alignItems: 'center' as any,
     marginHorizontal: 4,
+    backgroundColor: COLORS.surfaceHover,
   },
   pageBtnSmall: {
-    padding: 8,
-    marginHorizontal: 8,
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    justifyContent: 'center' as any,
+    alignItems: 'center' as any,
+    marginHorizontal: 6,
+    backgroundColor: COLORS.surfaceHover,
   },
   pageInfo: {
     flexDirection: 'row' as any,
     alignItems: 'baseline' as any,
-    marginHorizontal: 16,
+    marginHorizontal: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: COLORS.primary + '10',
+    borderRadius: 12,
   },
   pageNumber: {
-    fontSize: 18,
-    fontWeight: 'bold' as any,
-    color: '#2196F3',
+    fontSize: 20,
+    fontWeight: '700' as any,
+    color: COLORS.primary,
   },
   pageSeparator: {
-    fontSize: 14,
-    color: '#ccc',
-    marginHorizontal: 4,
+    fontSize: 16,
+    color: COLORS.text.tertiary,
+    marginHorizontal: 6,
+    fontWeight: '500' as any,
   },
   pageTotalText: {
-    fontSize: 14,
-    color: '#999',
+    fontSize: 16,
+    color: COLORS.text.secondary,
+    fontWeight: '600' as any,
   },
   bottomMenu: {
     flexDirection: 'row' as any,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.surface,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-    paddingVertical: 8,
+    borderTopColor: COLORS.border.light,
+    paddingVertical: 12,
+    paddingBottom: 20,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.shadow.lg,
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 1,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
   },
   menuItem: {
     flex: 1,
@@ -1050,157 +1198,216 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   menuText: {
-    fontSize: 11,
-    color: '#666',
-    marginTop: 4,
+    fontSize: 12,
+    color: COLORS.text.tertiary,
+    marginTop: 6,
+    fontWeight: '500' as any,
   },
   menuTextActive: {
-    color: '#2196F3',
-    fontWeight: 'bold' as any,
+    color: COLORS.primary,
+    fontWeight: '600' as any,
   },
   createButton: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#2196F3',
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: COLORS.primary,
     justifyContent: 'center' as any,
     alignItems: 'center' as any,
-    marginTop: -20,
+    marginTop: -24,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.primary,
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.4,
+        shadowRadius: 16,
+      },
+      android: {
+        elevation: 8,
+      },
+    }),
   },
   modal: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: COLORS.background,
   },
   modalHeader: {
-    backgroundColor: '#2196F3',
-    padding: 16,
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
     flexDirection: 'row' as any,
     justifyContent: 'space-between' as any,
     alignItems: 'center' as any,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border.light,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold' as any,
-    color: '#fff',
+    fontSize: 20,
+    fontWeight: '600' as any,
+    color: COLORS.text.primary,
+    letterSpacing: -0.3,
   },
   modalContent: {
     flex: 1,
-    padding: 20,
+    padding: 24,
   },
   detailTitle: {
-    fontSize: 24,
-    fontWeight: 'bold' as any,
-    color: '#1a1a1a',
+    fontSize: 28,
+    fontWeight: '700' as any,
+    color: COLORS.text.primary,
     marginBottom: 8,
+    letterSpacing: -0.5,
+    lineHeight: 34,
   },
   detailDate: {
-    fontSize: 13,
-    color: '#999',
-    marginBottom: 20,
+    fontSize: 14,
+    color: COLORS.text.tertiary,
+    marginBottom: 24,
+    fontWeight: '500' as any,
   },
   detailContentBox: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
+    backgroundColor: COLORS.surface,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: COLORS.border.light,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.shadow.sm,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 1,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
   },
   detailContent: {
-    fontSize: 15,
-    color: '#333',
-    lineHeight: 24,
+    fontSize: 16,
+    color: COLORS.text.secondary,
+    lineHeight: 26,
   },
   detailTags: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   detailTagsTitle: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 12,
-    fontWeight: 'bold' as any,
+    fontSize: 15,
+    color: COLORS.text.secondary,
+    marginBottom: 14,
+    fontWeight: '600' as any,
   },
   tagBig: {
     flexDirection: 'row' as any,
     alignItems: 'center' as any,
-    backgroundColor: '#E3F2FD',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-    marginRight: 8,
-    marginBottom: 8,
+    backgroundColor: COLORS.primary + '12',
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    marginRight: 10,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: COLORS.primary + '20',
   },
   tagBigText: {
-    fontSize: 13,
-    color: '#2196F3',
+    fontSize: 14,
+    color: COLORS.primary,
     marginLeft: 6,
-    fontWeight: 'bold' as any,
+    fontWeight: '600' as any,
   },
   createContent: {
     flex: 1,
-    padding: 20,
+    padding: 24,
   },
   label: {
-    fontSize: 14,
-    fontWeight: 'bold' as any,
-    color: '#1a1a1a',
-    marginBottom: 8,
-    marginTop: 12,
+    fontSize: 15,
+    fontWeight: '600' as any,
+    color: COLORS.text.primary,
+    marginBottom: 10,
+    marginTop: 16,
   },
   inputCreate: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: COLORS.surface,
+    borderRadius: 14,
+    padding: 18,
     fontSize: 16,
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderWidth: 2,
+    borderColor: COLORS.border.light,
+    color: COLORS.text.primary,
   },
   textArea: {
-    height: 200,
+    height: 220,
     textAlignVertical: 'top' as any,
   },
   helpText: {
-    fontSize: 12,
-    color: '#999',
-    marginTop: 4,
-    marginBottom: 20,
+    fontSize: 13,
+    color: COLORS.text.tertiary,
+    marginTop: 6,
+    marginBottom: 24,
+    fontWeight: '400' as any,
   },
   buttonCreate: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: COLORS.secondary,
+    borderRadius: 16,
+    padding: 18,
     flexDirection: 'row' as any,
     justifyContent: 'center' as any,
     alignItems: 'center' as any,
-    marginTop: 20,
+    marginTop: 24,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.secondary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   buttonUpdate: {
-    backgroundColor: '#FF9800',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: COLORS.warning,
+    borderRadius: 16,
+    padding: 18,
     flexDirection: 'row' as any,
     justifyContent: 'center' as any,
     alignItems: 'center' as any,
-    marginTop: 20,
+    marginTop: 24,
+    ...Platform.select({
+      ios: {
+        shadowColor: COLORS.warning,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+      },
+      android: {
+        elevation: 4,
+      },
+    }),
   },
   detailActions: {
     flexDirection: 'row' as any,
-    marginTop: 20,
+    marginTop: 24,
   },
   editBtn: {
     flex: 1,
     flexDirection: 'row' as any,
     alignItems: 'center' as any,
     justifyContent: 'center' as any,
-    backgroundColor: '#E3F2FD',
-    padding: 16,
-    borderRadius: 12,
-    marginRight: 8,
+    backgroundColor: COLORS.primary + '12',
+    padding: 18,
+    borderRadius: 14,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: COLORS.primary + '30',
   },
   editBtnText: {
-    color: '#2196F3',
-    fontSize: 15,
-    fontWeight: 'bold' as any,
+    color: COLORS.primary,
+    fontSize: 16,
+    fontWeight: '600' as any,
     marginLeft: 8,
   },
   deleteBtn: {
@@ -1208,63 +1415,71 @@ const styles = StyleSheet.create({
     flexDirection: 'row' as any,
     alignItems: 'center' as any,
     justifyContent: 'center' as any,
-    backgroundColor: '#FFEBEE',
-    padding: 16,
-    borderRadius: 12,
-    marginLeft: 8,
+    backgroundColor: COLORS.danger + '12',
+    padding: 18,
+    borderRadius: 14,
+    marginLeft: 10,
+    borderWidth: 1,
+    borderColor: COLORS.danger + '30',
   },
   deleteBtnText: {
-    color: '#F44336',
-    fontSize: 15,
-    fontWeight: 'bold' as any,
+    color: COLORS.danger,
+    fontSize: 16,
+    fontWeight: '600' as any,
     marginLeft: 8,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'flex-end' as any,
   },
   profileModal: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    padding: 24,
+    backgroundColor: COLORS.surface,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: 28,
+    paddingBottom: 40,
   },
   profileHeader: {
     alignItems: 'center' as any,
-    paddingVertical: 24,
+    paddingVertical: 28,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-    marginBottom: 16,
+    borderBottomColor: COLORS.border.light,
+    marginBottom: 20,
   },
   profileEmail: {
-    fontSize: 16,
-    color: '#1a1a1a',
-    marginTop: 12,
-    fontWeight: 'bold' as any,
+    fontSize: 17,
+    color: COLORS.text.primary,
+    marginTop: 14,
+    fontWeight: '600' as any,
   },
   profileOption: {
     flexDirection: 'row' as any,
     alignItems: 'center' as any,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+    borderRadius: 14,
+    marginBottom: 8,
+    backgroundColor: COLORS.surfaceHover,
   },
   profileOptionText: {
     fontSize: 16,
-    color: '#1a1a1a',
+    color: COLORS.text.primary,
     marginLeft: 16,
+    fontWeight: '500' as any,
   },
   profileClose: {
-    marginTop: 16,
-    padding: 16,
-    backgroundColor: '#f5f5f5',
-    borderRadius: 12,
+    marginTop: 20,
+    padding: 18,
+    backgroundColor: COLORS.surfaceHover,
+    borderRadius: 14,
     alignItems: 'center' as any,
+    borderWidth: 1,
+    borderColor: COLORS.border.light,
   },
   profileCloseText: {
     fontSize: 16,
-    color: '#666',
-    fontWeight: 'bold' as any,
+    color: COLORS.text.secondary,
+    fontWeight: '600' as any,
   },
 });
