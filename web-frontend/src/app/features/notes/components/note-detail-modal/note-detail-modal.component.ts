@@ -1,6 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Note } from '../../services/notes.service';
+import { Note, NotesService } from '../../services/notes.service';
 
 @Component({
   selector: 'app-note-detail-modal',
@@ -10,14 +10,54 @@ import { Note } from '../../services/notes.service';
   styleUrls: ['./note-detail-modal.component.scss']
 })
 export class NoteDetailModalComponent {
+  private notesService = inject(NotesService);
+  
   @Input() note: Note | null = null;
   @Input() isOpen = false;
   @Output() onClose = new EventEmitter<void>();
   @Output() onEdit = new EventEmitter<string>();
   @Output() onDelete = new EventEmitter<string>();
+  @Output() onShareLinkGenerated = new EventEmitter<Note>();
+
+  shareLinkCopied = false;
+  generatingLink = false;
 
   close(): void {
     this.onClose.emit();
+  }
+
+  getShareUrl(): string | null {
+    if (!this.note?.shareToken) return null;
+    return this.notesService.getShareUrl(this.note.shareToken);
+  }
+
+  copyShareLink(): void {
+    const url = this.getShareUrl();
+    if (url) {
+      navigator.clipboard.writeText(url).then(() => {
+        this.shareLinkCopied = true;
+        setTimeout(() => {
+          this.shareLinkCopied = false;
+        }, 2000);
+      });
+    }
+  }
+
+  generateShareLink(): void {
+    if (!this.note) return;
+    this.generatingLink = true;
+    this.notesService.generateShareLink(this.note.id).subscribe({
+      next: (updatedNote) => {
+        this.note = updatedNote;
+        this.onShareLinkGenerated.emit(updatedNote);
+        this.generatingLink = false;
+        this.copyShareLink();
+      },
+      error: (error) => {
+        console.error('Error generating share link', error);
+        this.generatingLink = false;
+      }
+    });
   }
 
   renderMarkdown(content: string): string {

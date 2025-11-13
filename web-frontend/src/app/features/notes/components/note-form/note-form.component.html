@@ -18,12 +18,60 @@
       </div>
 
       <div class="form-group">
-        <label>Visibilité</label>
-        <select formControlName="visibility" class="form-control">
-          <option value="PRIVATE">Privée</option>
-          <option value="SHARED">Partagée</option>
-          <option value="PUBLIC">Publique</option>
-        </select>
+        <label class="form-label">
+          <span>Visibilité</span>
+          <span class="label-hint">Définissez qui peut voir cette note</span>
+        </label>
+        <div class="visibility-options">
+          <label class="visibility-option" [class.active]="noteForm.get('visibility')?.value === 'PRIVATE'">
+            <input type="radio" formControlName="visibility" value="PRIVATE" class="vis-radio">
+            <div class="vis-content">
+              <div class="vis-icon private">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </div>
+              <div class="vis-info">
+                <div class="vis-name">Privée</div>
+                <div class="vis-desc">Seulement vous pouvez voir cette note</div>
+              </div>
+            </div>
+          </label>
+          
+          <label class="visibility-option" [class.active]="noteForm.get('visibility')?.value === 'SHARED'">
+            <input type="radio" formControlName="visibility" value="SHARED" class="vis-radio">
+            <div class="vis-content">
+              <div class="vis-icon shared">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+              </div>
+              <div class="vis-info">
+                <div class="vis-name">Partagée</div>
+                <div class="vis-desc">Accessible via un lien partagé unique</div>
+              </div>
+            </div>
+          </label>
+          
+          <label class="visibility-option" [class.active]="noteForm.get('visibility')?.value === 'PUBLIC'">
+            <input type="radio" formControlName="visibility" value="PUBLIC" class="vis-radio">
+            <div class="vis-content">
+              <div class="vis-icon public">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="2" y1="12" x2="22" y2="12"></line>
+                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                </svg>
+              </div>
+              <div class="vis-info">
+                <div class="vis-name">Publique</div>
+                <div class="vis-desc">Tous les utilisateurs authentifiés peuvent voir</div>
+              </div>
+            </div>
+          </label>
+        </div>
       </div>
 
       <div class="form-group">

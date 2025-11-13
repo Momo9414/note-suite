@@ -10,19 +10,24 @@ export interface AuthResponse {
 }
 
 // Note Types
+export type Visibility = 'PRIVATE' | 'SHARED' | 'PUBLIC';
+
 export interface Note {
   id: string;
   title: string;
   contentMd: string;
+  visibility: Visibility;
+  shareToken?: string;
   tags: string[];
+  ownerId: string;
   createdAt: string;
   updatedAt: string;
-  userId: string;
 }
 
 export interface NoteRequest {
   title: string;
   contentMd: string;
+  visibility: Visibility;
   tags: string[];
 }
 

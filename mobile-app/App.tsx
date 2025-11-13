@@ -13,6 +13,7 @@ import {
   ScrollView,
   SafeAreaView,
   Platform,
+  Share,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
@@ -79,6 +80,7 @@ export default function App() {
   const [newTitle, setNewTitle] = useState('');
   const [newContent, setNewContent] = useState('');
   const [newTags, setNewTags] = useState('');
+  const [newVisibility, setNewVisibility] = useState<'PRIVATE' | 'SHARED' | 'PUBLIC'>('PRIVATE');
   
   // Profile modal
   const [showProfile, setShowProfile] = useState(false);
@@ -165,12 +167,14 @@ export default function App() {
       await notesService.createNote({
         title: newTitle,
         contentMd: newContent,
+        visibility: newVisibility,
         tags: tagsArray,
       });
       setCreateMode(false);
       setNewTitle('');
       setNewContent('');
       setNewTags('');
+      setNewVisibility('PRIVATE');
       setPage(0);
       loadNotes();
       setBottomTab('list');
@@ -193,6 +197,7 @@ export default function App() {
       await notesService.updateNote(editingNoteId, {
         title: newTitle,
         contentMd: newContent,
+        visibility: newVisibility,
         tags: tagsArray,
       });
       setEditMode(false);
@@ -200,6 +205,7 @@ export default function App() {
       setNewTitle('');
       setNewContent('');
       setNewTags('');
+      setNewVisibility('PRIVATE');
       loadNotes();
       setSelectedNote(null);
     } catch (error) {
@@ -214,6 +220,7 @@ export default function App() {
     setNewTitle(note.title);
     setNewContent(note.contentMd);
     setNewTags(note.tags.join(', '));
+    setNewVisibility(note.visibility);
     setSelectedNote(null);
     setEditMode(true);
   };
@@ -359,6 +366,48 @@ export default function App() {
             textAlignVertical="top"
           />
 
+          <Text style={styles.label}>Visibilité</Text>
+          <View style={styles.visibilityContainer}>
+            {(['PRIVATE', 'SHARED', 'PUBLIC'] as const).map((vis) => (
+              <TouchableOpacity
+                key={vis}
+                style={[
+                  styles.visibilityOption,
+                  newVisibility === vis && styles.visibilityOptionActive,
+                ]}
+                onPress={() => setNewVisibility(vis)}
+              >
+                <View style={styles.visibilityContent}>
+                  <View
+                    style={[
+                      styles.radioButton,
+                      newVisibility === vis && styles.radioButtonActive,
+                    ]}
+                  >
+                    {newVisibility === vis && <View style={styles.radioButtonInner} />}
+                  </View>
+                  <View style={styles.visibilityInfo}>
+                    <Text
+                      style={[
+                        styles.visibilityName,
+                        newVisibility === vis && styles.visibilityNameActive,
+                      ]}
+                    >
+                      {vis === 'PRIVATE' ? 'Privée' : vis === 'SHARED' ? 'Partagée' : 'Publique'}
+                    </Text>
+                    <Text style={styles.visibilityDesc}>
+                      {vis === 'PRIVATE'
+                        ? 'Seulement vous pouvez voir'
+                        : vis === 'SHARED'
+                        ? 'Accessible via un lien partagé'
+                        : 'Tous les utilisateurs authentifiés'}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+
           <Text style={styles.label}>Tags (séparés par des virgules)</Text>
           <TextInput
             style={styles.inputCreate}
@@ -402,16 +451,47 @@ export default function App() {
           <Ionicons name="document-text-outline" size={26} color={COLORS.primary} />
         </View>
         <View style={styles.noteTitleBox}>
-          <Text style={styles.noteTitle} numberOfLines={1}>
+          <Text style={styles.noteTitle} numberOfLines={2}>
             {item.title}
           </Text>
-          <Text style={styles.noteDate}>
-            {new Date(item.updatedAt).toLocaleDateString('fr-FR', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric',
-            })}
-          </Text>
+          <View style={styles.noteMetaRow}>
+            <Text style={styles.noteDate}>
+              {new Date(item.updatedAt).toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric',
+              })}
+            </Text>
+            <View
+              style={[
+                styles.visibilityBadgeSmall,
+                {
+                  backgroundColor:
+                    item.visibility === 'PRIVATE'
+                      ? '#ef444420'
+                      : item.visibility === 'SHARED'
+                      ? '#f59e0b20'
+                      : '#10b98120',
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.visibilityTextSmall,
+                  {
+                    color:
+                      item.visibility === 'PRIVATE'
+                        ? '#ef4444'
+                        : item.visibility === 'SHARED'
+                        ? '#f59e0b'
+                        : '#10b981',
+                  },
+                ]}
+              >
+                {item.visibility === 'PRIVATE' ? 'Privée' : item.visibility === 'SHARED' ? 'Partagée' : 'Publique'}
+              </Text>
+            </View>
+          </View>
         </View>
       </View>
 
@@ -561,6 +641,39 @@ export default function App() {
 
           <ScrollView style={styles.modalContent}>
             <Text style={styles.detailTitle}>{selectedNote?.title}</Text>
+            <View
+              style={[
+                styles.visibilityBadgeDetail,
+                {
+                  backgroundColor:
+                    selectedNote?.visibility === 'PRIVATE'
+                      ? '#ef444420'
+                      : selectedNote?.visibility === 'SHARED'
+                      ? '#f59e0b20'
+                      : '#10b98120',
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.visibilityTextDetail,
+                  {
+                    color:
+                      selectedNote?.visibility === 'PRIVATE'
+                        ? '#ef4444'
+                        : selectedNote?.visibility === 'SHARED'
+                        ? '#f59e0b'
+                        : '#10b981',
+                  },
+                ]}
+              >
+                {selectedNote?.visibility === 'PRIVATE'
+                  ? 'Privée'
+                  : selectedNote?.visibility === 'SHARED'
+                  ? 'Partagée'
+                  : 'Publique'}
+              </Text>
+            </View>
             <Text style={styles.detailDate}>
               Modifié le {selectedNote && new Date(selectedNote.updatedAt).toLocaleDateString('fr-FR')}
             </Text>
@@ -582,6 +695,43 @@ export default function App() {
                     </View>
                   ))}
                 </View>
+              </View>
+            )}
+
+            {selectedNote?.visibility === 'SHARED' && (
+              <View style={styles.shareSection}>
+                <Text style={styles.detailTagsTitle}>Lien de partage</Text>
+                <TouchableOpacity
+                  style={styles.shareButton}
+                  onPress={async () => {
+                    if (!selectedNote) return;
+                    try {
+                      if (!selectedNote.shareToken) {
+                        const updatedNote = await notesService.generateShareLink(selectedNote.id);
+                        const shareUrl = notesService.getShareUrl(updatedNote.shareToken!);
+                        await Share.share({
+                          message: `Partage de note: ${selectedNote.title}\n${shareUrl}`,
+                          url: shareUrl,
+                        });
+                        setSelectedNote(updatedNote);
+                        loadNotes();
+                      } else {
+                        const shareUrl = notesService.getShareUrl(selectedNote.shareToken);
+                        await Share.share({
+                          message: `Partage de note: ${selectedNote.title}\n${shareUrl}`,
+                          url: shareUrl,
+                        });
+                      }
+                    } catch (error: any) {
+                      Alert.alert('Erreur', 'Impossible de partager la note');
+                    }
+                  }}
+                >
+                  <Ionicons name="share-outline" size={22} color={COLORS.text.inverse} />
+                  <Text style={styles.shareButtonText}>
+                    {selectedNote.shareToken ? 'Partager le lien' : 'Générer le lien'}
+                  </Text>
+                </TouchableOpacity>
               </View>
             )}
 
@@ -652,6 +802,48 @@ export default function App() {
               numberOfLines={10}
               textAlignVertical="top"
             />
+
+            <Text style={styles.label}>Visibilité</Text>
+            <View style={styles.visibilityContainer}>
+              {(['PRIVATE', 'SHARED', 'PUBLIC'] as const).map((vis) => (
+                <TouchableOpacity
+                  key={vis}
+                  style={[
+                    styles.visibilityOption,
+                    newVisibility === vis && styles.visibilityOptionActive,
+                  ]}
+                  onPress={() => setNewVisibility(vis)}
+                >
+                  <View style={styles.visibilityContent}>
+                    <View
+                      style={[
+                        styles.radioButton,
+                        newVisibility === vis && styles.radioButtonActive,
+                      ]}
+                    >
+                      {newVisibility === vis && <View style={styles.radioButtonInner} />}
+                    </View>
+                    <View style={styles.visibilityInfo}>
+                      <Text
+                        style={[
+                          styles.visibilityName,
+                          newVisibility === vis && styles.visibilityNameActive,
+                        ]}
+                      >
+                        {vis === 'PRIVATE' ? 'Privée' : vis === 'SHARED' ? 'Partagée' : 'Publique'}
+                      </Text>
+                      <Text style={styles.visibilityDesc}>
+                        {vis === 'PRIVATE'
+                          ? 'Seulement vous pouvez voir'
+                          : vis === 'SHARED'
+                          ? 'Accessible via un lien partagé'
+                          : 'Tous les utilisateurs authentifiés'}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
 
             <Text style={styles.label}>Tags</Text>
             <TextInput
@@ -759,6 +951,48 @@ export default function App() {
               numberOfLines={10}
               textAlignVertical="top"
             />
+
+            <Text style={styles.label}>Visibilité</Text>
+            <View style={styles.visibilityContainer}>
+              {(['PRIVATE', 'SHARED', 'PUBLIC'] as const).map((vis) => (
+                <TouchableOpacity
+                  key={vis}
+                  style={[
+                    styles.visibilityOption,
+                    newVisibility === vis && styles.visibilityOptionActive,
+                  ]}
+                  onPress={() => setNewVisibility(vis)}
+                >
+                  <View style={styles.visibilityContent}>
+                    <View
+                      style={[
+                        styles.radioButton,
+                        newVisibility === vis && styles.radioButtonActive,
+                      ]}
+                    >
+                      {newVisibility === vis && <View style={styles.radioButtonInner} />}
+                    </View>
+                    <View style={styles.visibilityInfo}>
+                      <Text
+                        style={[
+                          styles.visibilityName,
+                          newVisibility === vis && styles.visibilityNameActive,
+                        ]}
+                      >
+                        {vis === 'PRIVATE' ? 'Privée' : vis === 'SHARED' ? 'Partagée' : 'Publique'}
+                      </Text>
+                      <Text style={styles.visibilityDesc}>
+                        {vis === 'PRIVATE'
+                          ? 'Seulement vous pouvez voir'
+                          : vis === 'SHARED'
+                          ? 'Accessible via un lien partagé'
+                          : 'Tous les utilisateurs authentifiés'}
+                      </Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
 
             <Text style={styles.label}>Tags</Text>
             <TextInput
@@ -1062,13 +1296,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600' as any,
     color: COLORS.text.primary,
-    marginBottom: 4,
+    marginBottom: 8,
     letterSpacing: -0.3,
+    flex: 1,
+  },
+  noteMetaRow: {
+    flexDirection: 'row' as any,
+    alignItems: 'center' as any,
+    justifyContent: 'space-between' as any,
+    gap: 8,
   },
   noteDate: {
     fontSize: 13,
     color: COLORS.text.tertiary,
     fontWeight: '500' as any,
+    flex: 1,
   },
   noteContent: {
     fontSize: 15,
@@ -1481,5 +1723,112 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.text.secondary,
     fontWeight: '600' as any,
+  },
+  visibilityBadgeSmall: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    borderWidth: 1,
+    flexShrink: 0,
+  },
+  visibilityTextSmall: {
+    fontSize: 10,
+    fontWeight: '600' as any,
+    textTransform: 'uppercase' as any,
+    letterSpacing: 0.5,
+  },
+  visibilityContainer: {
+    gap: 12,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  visibilityOption: {
+    backgroundColor: COLORS.surface,
+    borderWidth: 2,
+    borderColor: COLORS.border.light,
+    borderRadius: 12,
+    padding: 14,
+  },
+  visibilityOptionActive: {
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.primary + '08',
+  },
+  visibilityContent: {
+    flexDirection: 'row' as any,
+    alignItems: 'center' as any,
+    gap: 12,
+  },
+  radioButton: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: COLORS.border.medium,
+    justifyContent: 'center' as any,
+    alignItems: 'center' as any,
+  },
+  radioButtonActive: {
+    borderColor: COLORS.primary,
+  },
+  radioButtonInner: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: COLORS.primary,
+  },
+  visibilityInfo: {
+    flex: 1,
+  },
+  visibilityName: {
+    fontSize: 16,
+    fontWeight: '600' as any,
+    color: COLORS.text.primary,
+    marginBottom: 4,
+  },
+  visibilityNameActive: {
+    color: COLORS.primary,
+  },
+  visibilityDesc: {
+    fontSize: 13,
+    color: COLORS.text.secondary,
+    lineHeight: 18,
+  },
+  visibilityBadgeDetail: {
+    alignSelf: 'flex-start' as any,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 12,
+  },
+  visibilityTextDetail: {
+    fontSize: 12,
+    fontWeight: '600' as any,
+    textTransform: 'uppercase' as any,
+    letterSpacing: 0.5,
+  },
+  shareSection: {
+    marginTop: 20,
+    marginBottom: 20,
+    padding: 16,
+    backgroundColor: '#f59e0b08',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#f59e0b20',
+  },
+  shareButton: {
+    flexDirection: 'row' as any,
+    alignItems: 'center' as any,
+    justifyContent: 'center' as any,
+    backgroundColor: '#f59e0b',
+    padding: 14,
+    borderRadius: 12,
+    marginTop: 12,
+  },
+  shareButtonText: {
+    color: COLORS.text.inverse,
+    fontSize: 16,
+    fontWeight: '600' as any,
+    marginLeft: 8,
   },
 });

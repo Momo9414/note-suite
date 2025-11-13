@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { getToken } from '../storage/tokenStorage';
 
-const API_BASE_URL = 'http://192.168.1.37:8080/api/v1';
+const API_BASE_URL = 'http://192.168.1.57:8080/api/v1';
 
 class ApiClient {
   private client: AxiosInstance;
@@ -16,12 +16,17 @@ class ApiClient {
       },
     });
 
-    // Intercepteur pour ajouter le token JWT
+    // Intercepteur pour ajouter le token JWT (sauf pour les endpoints publics)
     this.client.interceptors.request.use(
       async (config) => {
-        const token = await getToken();
-        if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+        // Ne pas ajouter le token pour les endpoints publics (notes partagées)
+        const isPublicEndpoint = config.url?.includes('/notes/shared/');
+        
+        if (!isPublicEndpoint) {
+          const token = await getToken();
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
         }
         console.log(`📡 ${config.method?.toUpperCase()} ${config.url}`);
         return config;

@@ -8,6 +8,7 @@ export interface Note {
   title: string;
   contentMd: string;
   visibility: 'PRIVATE' | 'SHARED' | 'PUBLIC';
+  shareToken?: string;
   tags: string[];
   ownerId: string;
   createdAt: string;
@@ -75,6 +76,20 @@ export class NotesService {
 
   deleteNote(id: string): Observable<void> {
     return this.http.delete<void>(`${this.API_URL}/${id}`);
+  }
+
+  getSharedNote(token: string): Observable<Note> {
+    return this.http.get<Note>(`${this.API_URL}/shared/${token}`);
+  }
+
+  generateShareLink(id: string): Observable<Note> {
+    return this.http.post<Note>(`${this.API_URL}/${id}/share`, {});
+  }
+
+  getShareUrl(token: string): string {
+    // URL du frontend pour afficher la note partagée
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/shared/${token}`;
   }
 }
 

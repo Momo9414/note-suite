@@ -29,6 +29,9 @@ public class Note {
     @Column(nullable = false)
     private Visibility visibility = Visibility.PRIVATE;
 
+    @Column(unique = true)
+    private String shareToken; // Token unique pour accéder aux notes SHARED via lien partagé
+
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "note_tags", joinColumns = @JoinColumn(name = "note_id"))
     @Column(name = "tag")

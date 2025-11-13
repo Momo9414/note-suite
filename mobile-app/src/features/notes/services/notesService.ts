@@ -30,6 +30,21 @@ class NotesService {
   async deleteNote(id: string): Promise<void> {
     await apiClient.delete(`/notes/${id}`);
   }
+
+  async getSharedNote(token: string): Promise<Note> {
+    const response = await apiClient.get<Note>(`/notes/shared/${token}`);
+    return response.data;
+  }
+
+  async generateShareLink(id: string): Promise<Note> {
+    const response = await apiClient.post<Note>(`/notes/${id}/share`, {});
+    return response.data;
+  }
+
+  getShareUrl(token: string): string {
+    // URL du frontend web pour partager (ou on peut utiliser deep linking mobile)
+    return `http://localhost:8081/shared/${token}`;
+  }
 }
 
 export const notesService = new NotesService();

@@ -25,7 +25,7 @@ export class NoteFormComponent implements OnInit {
   noteForm = this.fb.group({
     title: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
     contentMd: [''],
-    visibility: ['PRIVATE'],
+    visibility: ['PRIVATE' as 'PRIVATE' | 'SHARED' | 'PUBLIC'],
     tagsInput: ['']
   });
 

@@ -22,6 +22,9 @@ public class NoteResponse {
     @Schema(description = "Niveau de visibilité de la note", example = "PRIVATE")
     private Visibility visibility;
     
+    @Schema(description = "Token de partage pour les notes SHARED (null pour PRIVATE et PUBLIC)", example = "abc123xyz")
+    private String shareToken;
+    
     @Schema(description = "Tags associés à la note", example = "[\"travail\", \"important\"]")
     private Set<String> tags;
     

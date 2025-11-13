@@ -1,0 +1,58 @@
+<div class="shared-note-container">
+  @if (loading) {
+    <div class="loading-state">
+      <div class="loading-message">Chargement de la note...</div>
+    </div>
+  }
+
+  @if (error) {
+    <div class="error-state">
+      <div class="error-card">
+        <h2>Erreur</h2>
+        <p>{{ error }}</p>
+        <p class="error-hint">Le lien de partage est peut-être invalide ou la note a été supprimée.</p>
+      </div>
+    </div>
+  }
+
+  @if (!loading && !error && note) {
+    <div class="shared-note-card">
+      <div class="note-header">
+        <h1>{{ note.title }}</h1>
+        <div class="note-badge">
+          <span class="badge-label">Note partagée</span>
+        </div>
+      </div>
+
+      <div class="note-metadata">
+        <div class="metadata-item">
+          <span class="metadata-label">Créée le:</span>
+          <span class="metadata-value">{{ formatDate(note.createdAt) }}</span>
+        </div>
+        @if (note.updatedAt !== note.createdAt) {
+          <div class="metadata-item">
+            <span class="metadata-label">Modifiée le:</span>
+            <span class="metadata-value">{{ formatDate(note.updatedAt) }}</span>
+          </div>
+        }
+      </div>
+
+      @if (note.tags && note.tags.length > 0) {
+        <div class="note-tags-section">
+          <div class="tags-label">Tags:</div>
+          <div class="tags-list">
+            @for (tag of note.tags; track tag) {
+              <span class="tag">{{ tag }}</span>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="note-content-section">
+        <div class="content-label">Contenu</div>
+        <div class="markdown-content" [innerHTML]="renderMarkdown(note.contentMd)"></div>
+      </div>
+    </div>
+  }
+</div>
+

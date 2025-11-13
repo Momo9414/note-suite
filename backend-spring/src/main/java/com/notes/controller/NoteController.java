@@ -237,5 +237,75 @@ public class NoteController {
         noteService.deleteNote(id, userId);
         return ResponseEntity.noContent().build();
     }
+
+    @Operation(
+            summary = "Récupérer une note via son lien partagé",
+            description = "Récupère une note SHARED via son token de partage. Accès public (pas besoin d'authentification)."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Note trouvée",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = NoteResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Note introuvable ou lien invalide",
+                    content = @Content
+            )
+    })
+    @GetMapping("/shared/{token}")
+    @io.swagger.v3.oas.annotations.security.SecurityRequirement(name = "")
+    public ResponseEntity<NoteResponse> getSharedNote(
+            @Parameter(description = "Token de partage de la note")
+            @PathVariable String token) {
+        return ResponseEntity.ok(noteService.getNoteByShareToken(token));
+    }
+
+    @Operation(
+            summary = "Générer ou régénérer le lien de partage",
+            description = "Génère un nouveau token de partage pour une note SHARED. Invalide l'ancien lien."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Lien de partage généré avec succès",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = NoteResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "La note n'est pas de type SHARED",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "Token JWT manquant ou invalide",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Accès refusé - L'utilisateur n'est pas le propriétaire",
+                    content = @Content
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Note introuvable",
+                    content = @Content
+            )
+    })
+    @PostMapping("/{id}/share")
+    public ResponseEntity<NoteResponse> generateShareLink(
+            @Parameter(description = "Identifiant unique de la note (UUID)")
+            @PathVariable String id,
+            Authentication authentication) {
+        String userId = (String) authentication.getPrincipal();
+        return ResponseEntity.ok(noteService.generateShareLink(id, userId));
+    }
 }
 

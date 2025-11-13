@@ -2,7 +2,7 @@
   <header class="header">
     <h1>Mes Notes</h1>
     <div class="header-actions">
-      <button class="btn-primary" routerLink="/notes/new">+ Nouvelle note</button>
+      <button class="btn-primary" routerLink="/notes/new">Nouvelle note</button>
       <button class="btn-secondary" (click)="logout()">Déconnexion</button>
     </div>
   </header>
@@ -35,7 +35,12 @@
       @for (note of notes; track note.id) {
         <div class="note-card">
           <div class="note-content" (click)="viewNote(note.id)">
-            <h3>{{ note.title }}</h3>
+            <div class="note-header">
+              <h3>{{ note.title }}</h3>
+              <span class="visibility-badge visibility-{{ note.visibility.toLowerCase() }}">
+                {{ getVisibilityLabel(note.visibility) }}
+              </span>
+            </div>
             <p class="note-preview">{{ note.contentMd | slice:0:150 }}...</p>
             <div class="note-meta">
               <span class="note-date">{{ note.updatedAt | date:'short' }}</span>
@@ -83,7 +88,8 @@
     [isOpen]="isModalOpen"
     (onClose)="closeModal()"
     (onEdit)="editNote($event)"
-    (onDelete)="deleteNoteFromModal($event)">
+    (onDelete)="deleteNoteFromModal($event)"
+    (onShareLinkGenerated)="onShareLinkGenerated($event)">
   </app-note-detail-modal>
 </div>
 

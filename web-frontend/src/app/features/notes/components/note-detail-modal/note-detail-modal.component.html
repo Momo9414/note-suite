@@ -33,6 +33,42 @@
           </div>
         }
 
+        @if (note.visibility === 'SHARED') {
+          <div class="share-section">
+            <div class="label">Lien de partage:</div>
+            @if (note.shareToken) {
+              <div class="share-link-container">
+                <input 
+                  type="text" 
+                  [value]="getShareUrl()" 
+                  readonly 
+                  class="share-link-input"
+                  id="shareLink">
+                <button 
+                  class="btn-copy" 
+                  (click)="copyShareLink()"
+                  [class.copied]="shareLinkCopied">
+                  {{ shareLinkCopied ? '✓ Copié' : 'Copier' }}
+                </button>
+                <button 
+                  class="btn-regenerate" 
+                  (click)="generateShareLink()"
+                  [disabled]="generatingLink">
+                  {{ generatingLink ? 'Génération...' : 'Régénérer' }}
+                </button>
+              </div>
+            } @else {
+              <button 
+                class="btn-generate" 
+                (click)="generateShareLink()"
+                [disabled]="generatingLink">
+                {{ generatingLink ? 'Génération...' : 'Générer le lien' }}
+              </button>
+            }
+            <p class="share-info">Partagez ce lien pour donner accès à la note</p>
+          </div>
+        }
+
         <div class="content-section">
           <h3>Contenu</h3>
           <div class="markdown-content" [innerHTML]="renderMarkdown(note.contentMd)"></div>

@@ -109,6 +109,17 @@ export class NotesListComponent implements OnInit {
     this.deleteNote(id);
   }
 
+  onShareLinkGenerated(note: any): void {
+    // Mettre à jour la note dans la liste si nécessaire
+    const index = this.notes.findIndex(n => n.id === note.id);
+    if (index !== -1) {
+      this.notes[index] = note;
+      if (this.selectedNote?.id === note.id) {
+        this.selectedNote = note;
+      }
+    }
+  }
+
   // Pagination methods
   nextPage(): void {
     if (!this.isLastPage) {
@@ -133,6 +144,19 @@ export class NotesListComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  getVisibilityLabel(visibility: string): string {
+    switch (visibility) {
+      case 'PRIVATE':
+        return 'Privée';
+      case 'SHARED':
+        return 'Partagée';
+      case 'PUBLIC':
+        return 'Publique';
+      default:
+        return visibility;
+    }
   }
 }
 
