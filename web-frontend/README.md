@@ -1,8 +1,8 @@
-# 🎨 Frontend Angular - Notes Collaboratives
+# Frontend Angular – Notes Suite
 
 Application web Angular pour la gestion de notes collaboratives.
 
-## 📋 Table des matières
+## Table des matières
 
 - [Technologies](#technologies)
 - [Prérequis](#prérequis)
@@ -13,7 +13,7 @@ Application web Angular pour la gestion de notes collaboratives.
 - [Tests](#tests)
 - [Structure du projet](#structure-du-projet)
 
-## 🛠️ Technologies
+## Technologies
 
 | Technologie | Version | Description |
 |------------|---------|-------------|
@@ -25,7 +25,7 @@ Application web Angular pour la gestion de notes collaboratives.
 | Jasmine/Karma | - | Tests unitaires |
 | Cypress | 13.x | Tests E2E |
 
-## 📦 Prérequis
+## Prérequis
 
 - Node.js 18.x LTS ou supérieur
 - npm 9.x ou supérieur
@@ -35,14 +35,14 @@ Application web Angular pour la gestion de notes collaboratives.
 npm install -g @angular/cli@17
 ```
 
-## 🚀 Installation
+## Installation
 
 ```bash
 cd web-frontend
 npm install
 ```
 
-## ⚙️ Configuration
+## Configuration
 
 ### Environnements
 
@@ -72,7 +72,7 @@ export const environment = {
 };
 ```
 
-## 🏃 Lancement
+## Lancement
 
 ### Mode développement
 
@@ -107,7 +107,7 @@ ng serve --proxy-config proxy.conf.json
 npm run watch
 ```
 
-## 🔨 Build
+## Build
 
 ### Build de développement
 
@@ -123,7 +123,7 @@ npm run build:prod
 
 Les fichiers de build seront dans `dist/`
 
-## 🧪 Tests
+## Tests
 
 ### Tests unitaires
 
@@ -159,7 +159,7 @@ npm run lint:fix
 npm run format
 ```
 
-## 📁 Structure du projet
+## Structure du projet
 
 ```
 web-frontend/
@@ -258,7 +258,7 @@ web-frontend/
 └── README.md
 ```
 
-## 🎨 Architecture
+## Architecture
 
 ### Modules
 
@@ -321,7 +321,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 };
 ```
 
-## 🚢 Déploiement
+## Déploiement
 
 ### Docker
 
@@ -345,7 +345,7 @@ npm install -g netlify-cli
 netlify deploy --prod --dir=dist/notes-frontend-angular/browser
 ```
 
-## 📝 Conventions de code
+## Conventions de code
 
 - Utiliser le style guide Angular officiel
 - Nommer les composants avec le suffixe `.component.ts`
@@ -353,7 +353,7 @@ netlify deploy --prod --dir=dist/notes-frontend-angular/browser
 - Utiliser des interfaces TypeScript pour les modèles
 - Documenter les fonctions publiques avec JSDoc
 
-## 📝 Licence
+## Licence
 
-MIT
+À définir avec l’équipe projet.
 
